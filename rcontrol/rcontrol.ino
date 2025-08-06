@@ -21,7 +21,8 @@ const char index_html[] PROGMEM = R"rawliteral(
     #joystick {
       width: 200px;
       height: 200px;
-      border: 1px solid #000;
+      border: 2px solid #000;
+      border-radius: 50%;
       position: relative;
       margin: 50px auto;
     }
@@ -34,11 +35,24 @@ const char index_html[] PROGMEM = R"rawliteral(
       left: 75px;
       top: 75px;
     }
+    .marker {
+      position: absolute;
+      font-size: 12px;
+      color: #555;
+    }
+    .deg0 { top: 50%; right: -25px; transform: translateY(-50%); }
+    .deg90 { top: -20px; left: 50%; transform: translateX(-50%); }
+    .deg180 { top: 50%; left: -25px; transform: translateY(-50%); }
+    .deg270 { bottom: -20px; left: 50%; transform: translateX(-50%); }
   </style>
 </head>
 <body>
   <h1>ESP32 Robot Control</h1>
   <div id="joystick">
+    <div class="marker deg0">0</div>
+    <div class="marker deg90">90</div>
+    <div class="marker deg180">180</div>
+    <div class="marker deg270">270</div>
     <div id="handle"></div>
   </div>
 
@@ -73,7 +87,8 @@ const char index_html[] PROGMEM = R"rawliteral(
       }
     });
 
-    document.addEventListener('touchmove', (e) => {
+    joystick.addEventListener('touchmove', (e) => {
+      e.preventDefault(); // Prevent pull-to-refresh
       if (isDragging) {
         updateHandle(e.touches[0].clientX, e.touches[0].clientY);
       }
