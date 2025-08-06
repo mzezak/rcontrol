@@ -128,13 +128,6 @@ void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
 
-  // Create WiFi Access Point
-  Serial.print("Setting up AP...");
-  WiFi.softAP(ssid, password);
-  Serial.println("AP setup complete.");
-  Serial.print("AP IP address: ");
-  Serial.println(WiFi.softAPIP());
-
   // Route for root / web page
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html);
@@ -170,6 +163,16 @@ void setup() {
 
     request->send(200, "text/plain", "OK");
   });
+
+  // Create WiFi Access Point
+  Serial.print("Setting up AP...");
+  WiFi.softAP(ssid, password);
+
+  delay(100); // Add a small delay
+
+  Serial.println("AP setup complete.");
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
 
   // Start server
   server.begin();
