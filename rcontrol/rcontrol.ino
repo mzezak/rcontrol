@@ -82,16 +82,24 @@ const char index_html[] PROGMEM = R"rawliteral(
       isDragging = true;
     });
 
-    document.addEventListener('mouseup', () => {
+    joystick.addEventListener('mouseup', () => {
       isDragging = false;
       resetHandle();
-      stopInterval = setInterval(() => sendJoystickData(0, 0), 500);
+      stopInterval = setInterval(forceSendStopCommand, 500);
     });
 
-    document.addEventListener('touchend', () => {
+    joystick.addEventListener('touchend', () => {
       isDragging = false;
       resetHandle();
-      stopInterval = setInterval(() => sendJoystickData(0, 0), 500);
+      stopInterval = setInterval(forceSendStopCommand, 500);
+    });
+
+    joystick.addEventListener('mouseleave', () => {
+      if (isDragging) {
+        isDragging = false;
+        resetHandle();
+        stopInterval = setInterval(forceSendStopCommand, 500);
+      }
     });
 
     document.addEventListener('mousemove', (e) => {
@@ -151,6 +159,10 @@ const char index_html[] PROGMEM = R"rawliteral(
         fetch(`/joystick?x=${x}&y=${y}`);
         lastSendTime = now;
       }
+    }
+
+    function forceSendStopCommand() {
+      fetch(`/joystick?x=0&y=0`);
     }
 
     resetHandle(); // Initialize handle position
