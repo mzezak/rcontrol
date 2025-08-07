@@ -82,13 +82,14 @@ const char index_html[] PROGMEM = R"rawliteral(
       isDragging = true;
     });
 
-    document.addEventListener('mouseup', () => {
+    joystick.addEventListener('mouseup', () => {
       isDragging = false;
       resetHandle();
+
       stopInterval = setInterval(() => sendJoystickData(0, 0), 500);
     });
 
-    document.addEventListener('touchend', () => {
+    joystick.addEventListener('touchend', () => {
       isDragging = false;
       resetHandle();
       stopInterval = setInterval(() => sendJoystickData(0, 0), 500);
