@@ -70,24 +70,28 @@ const char index_html[] PROGMEM = R"rawliteral(
     const handle = document.getElementById('handle');
     let isDragging = false;
 
+    let stopInterval = null;
+
     joystick.addEventListener('mousedown', (e) => {
+      clearInterval(stopInterval);
       isDragging = true;
     });
 
     joystick.addEventListener('touchstart', (e) => {
+      clearInterval(stopInterval);
       isDragging = true;
     });
 
     document.addEventListener('mouseup', () => {
       isDragging = false;
       resetHandle();
-      sendJoystickData(0, 0);
+      stopInterval = setInterval(() => sendJoystickData(0, 0), 500);
     });
 
     document.addEventListener('touchend', () => {
       isDragging = false;
       resetHandle();
-      sendJoystickData(0, 0);
+      stopInterval = setInterval(() => sendJoystickData(0, 0), 500);
     });
 
     document.addEventListener('mousemove', (e) => {
@@ -138,8 +142,15 @@ const char index_html[] PROGMEM = R"rawliteral(
       handle.style.top = centerY + 'px';
     }
 
+    let lastSendTime = 0;
+    const SEND_INTERVAL = 333; // 3 times per second
+
     function sendJoystickData(x, y) {
-      fetch(`/joystick?x=${x}&y=${y}`);
+      const now = new Date().getTime();
+      if (now - lastSendTime > SEND_INTERVAL) {
+        fetch(`/joystick?x=${x}&y=${y}`);
+        lastSendTime = now;
+      }
     }
 
     resetHandle(); // Initialize handle position
@@ -209,7 +220,6 @@ void setup() {
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 #endif
-
 
   // Start server
   server.begin();
