@@ -1,9 +1,18 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 
-// WiFi credentials
-const char* ssid = "ESP32-Robot-Control";
-const char* password = "password";
+// --- WiFi Mode Configuration ---
+#define AP_MODE // Comment this line out to enable Station mode
+
+#ifdef AP_MODE
+  // AP Mode Credentials
+  const char* ssid = "ESP32-Robot-Control";
+  const char* password = "password";
+#else
+  // Station Mode Credentials
+  const char* ssid = "YOUR_WIFI_SSID";
+  const char* password = "YOUR_WIFI_PASSWORD";
+#endif
 
 // Create AsyncWebServer object on port 80
 AsyncWebServer server(80);
@@ -179,15 +188,27 @@ void setup() {
     request->send(200, "text/plain", "OK");
   });
 
-  // Create WiFi Access Point
+#ifdef AP_MODE
+  // AP Mode
   Serial.print("Setting up AP...");
   WiFi.softAP(ssid, password);
-
   delay(100); // Add a small delay
-
   Serial.println("AP setup complete.");
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());
+#else
+  // Station Mode
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected.");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+#endif
 
   // Start server
   server.begin();
